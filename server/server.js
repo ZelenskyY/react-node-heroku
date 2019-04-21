@@ -1,31 +1,28 @@
-import express from 'express';
+import express from 'express'
+import bodyParser from 'body-parser'
 import path from 'path'
 
 const app = express();
+const port = process.env.PORT || 5000
+const env = process.env.NODE_ENV || 'development'
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
+console.log(env)
 
-// Put all API endpoints under '/api'
-app.get('/api/passwords', (req, res) => {
-  const count = 5;
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
-  // Generate some passwords
-  const passwords = [12,34,545,57,356,245]
+app.get('/test', (req, res) => {
+  return res.send({ msg: 'hello there' })
+})
 
-  // Return them as json
-  res.json(passwords);
+// Server static assets if in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static('client/build'))
 
-  console.log(`Sent ${count} passwords`);
-});
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+  })
+}
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/build/index.html'));
-});
-
-const port = process.env.PORT || 5000;
-app.listen(port);
-
-console.log(`Password generator listening on ${port}`);
+app.listen(port, () => console.log(`Server running on port ${port}`));
