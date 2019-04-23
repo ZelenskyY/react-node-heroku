@@ -1,40 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
 
 const App = () => {
-  const [state, setState] = useState("foo")
-  useEffect(() => {
-    fetch('/test')
-      .then(res => res.json())
-      .then(res => {
-        console.log(res)
-        return setState(() => res.msg)
-      })
-    .catch(() => setState(() => 'wrong api'))
-  })
-
   return (
+    <div className="pt-5 mt-5">
+      <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div className="collapse navbar-collapse" id="navbarCollapse">
+          <form className="form-inline mt-2 mt-md-0">
+            <input
+              className="form-control mr-sm-2"
+              type="text"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button
+              className="btn btn-outline-success my-2 my-sm-0"
+              type="submit"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+      </nav>
 
-    <div className="App">
-
-        <h1>{ state }</h1>
-
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+      <main className="container">
+        <div className="jumbotron">
+          <h1>Navbar example</h1>
+          <p className="lead">
+            This example is a quick exercise to illustrate how fixed to top
+            navbar works. As you scroll, it will remain fixed to the top of your
+            browser's viewport.
           </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
+          <a
+            className="btn btn-lg btn-primary"
+            href="https://getbootstrap.com/docs/4.1/components/navbar/"
+            role="button"
+          >
+            View navbar docs »
           </a>
-      </header>
+        </div>
+      </main>
     </div>
-  )
-}
-
+  );
+};
 
 export default App;
