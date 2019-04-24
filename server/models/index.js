@@ -1,15 +1,15 @@
 import Sequelize from "sequelize";
 
 const sequelize = process.env.DATABASE_URL
-  // porodaction
-  ? new Sequelize(process.env.DATABASE_URL, {
+  ? // porodaction
+    new Sequelize(process.env.DATABASE_URL, {
       dialect: "postgres",
       dialectOptions: {
         ssl: true
       }
-  })
-  // local
-  : new Sequelize(
+    })
+  : // local
+    new Sequelize(
       process.env.DATABASE,
       process.env.DATABASE_USER,
       process.env.DATABASE_PASSWORD,
@@ -48,7 +48,10 @@ Task.createOne = async ({ username, email, task, status }) => {
       task,
       status
     });
-    return entry;
+    return {
+      status: "ok",
+      message: { entry }
+    };
   } catch (err) {
     return { status: "error" };
   }
@@ -56,12 +59,16 @@ Task.createOne = async ({ username, email, task, status }) => {
 
 Task.getAllTask = async ({ sort_field, sort_direction, page }) => {
   try {
+    const totalTaskCount = (await Task.findAll()).length;
     const entities = await Task.findAll({
       limit: 3,
       offset: page,
       order: [[sort_field, sort_direction]]
     });
-    return { task: [...entities] };
+    return {
+      status: "ok",
+      message: { task: [...entities], total_task_count: totalTaskCount }
+    };
   } catch (e) {
     return { status: "error" };
   }

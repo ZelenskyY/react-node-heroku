@@ -9,16 +9,6 @@ const app = express();
 const port = process.env.PORT || 5000;
 const env = process.env.NODE_ENV || "development";
 
-const responseFormat = message => {
-  if (message) {
-    return {
-      status: "OK",
-      message
-    };
-  }
-  return { status: "error", message: "" };
-};
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -29,13 +19,13 @@ app.get("/app", checkDeveloper, treatQuery, async (req, res) => {
     sort_direction,
     page
   });
-  return res.json(responseFormat(allEntris));
+  return res.json(allEntris);
 });
 
 app.post("/create", async (req, res) => {
   const { username, email, task, status } = req.body;
   const entry = await models.createOne({ username, email, task, status });
-  return res.json(responseFormat(entry));
+  return res.json(entry);
 });
 
 app.post("/edit/:id", async (req, res) => {
