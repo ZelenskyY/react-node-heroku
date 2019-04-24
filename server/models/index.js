@@ -1,13 +1,22 @@
 import Sequelize from "sequelize";
 
-const sequelize = new Sequelize(
-  process.env.DATABASE,
-  process.env.DATABASE_USER,
-  process.env.DATABASE_PASSWORD,
-  {
-    dialect: "postgres"
-  }
-);
+const sequelize = process.env.DATABASE_URL
+  // porodaction
+  ? new Sequelize(process.env.DATABASE_URL, {
+      dialect: "postgres",
+      dialectOptions: {
+        ssl: true
+      }
+  })
+  // local
+  : new Sequelize(
+      process.env.DATABASE,
+      process.env.DATABASE_USER,
+      process.env.DATABASE_PASSWORD,
+      {
+        dialect: "postgres"
+      }
+    );
 
 const Task = sequelize.define("task", {
   username: {
