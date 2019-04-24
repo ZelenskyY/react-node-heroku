@@ -22,7 +22,7 @@ const responseFormat = message => {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get("/", checkDeveloper, treatQuery, async (req, res) => {
+app.get("/app", checkDeveloper, treatQuery, async (req, res) => {
   const { sort_field, sort_direction, page } = req.query;
   const allEntris = await models.getAllTask({
     sort_field,
@@ -55,7 +55,12 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.get("*", (req, res) => res.json(responserGet));
+app.get("*", (req, res) =>
+  res.json({
+    status: "error",
+    message: ""
+  })
+);
 
 sequelize
   .sync({ force: 0 })
