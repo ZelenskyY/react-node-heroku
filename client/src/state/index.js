@@ -1,8 +1,7 @@
-const state = {
-  task: [],
-  pageControl: {
-    page: 0,
-    direction: "asc", // or "desc"
-    sortField: "id" //(id | username | email | status)
-  }
-};
+import { createStore, applyMiddleware } from 'redux'
+import thunk from "redux-thunk";
+import appReducer from './reducer'
+
+const store = createStore(appReducer, applyMiddleware(thunk));
+
+export default store

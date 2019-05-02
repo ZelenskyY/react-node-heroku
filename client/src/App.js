@@ -1,169 +1,171 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import md5 from "md5";
+import strictUriEncode from "strict-uri-encode";
 
-const App = () => {
+import { LOGIN, PASSWORD } from "./const";
+import { fetchTasksGet, fetchTaskPost } from "./state/middleware";
+import {
+  changeDirection,
+  sortBy,
+  goToPreviousPage,
+  goToNextPage,
+  logIn,
+  logOut
+} from "./state/actions";
+
+import Header from "./components/Heder";
+import Edit from "./components/Edit";
+import Form from "./components/Form";
+import SortButtons from "./components/SortButtons";
+import TaskList from "./components/TaskList";
+import Pagination from "./components/Pagination";
+
+const App = ({
+  // state property
+  tasks,
+  token,
+  login,
+  loged,
+  page,
+  totalTaskCount,
+  //action
+  fetchTasksGet,
+  fetchTaskPost,
+  changeDirection,
+  sortBy,
+  goToPreviousPage,
+  goToNextPage,
+  logIn,
+  logOut
+}) => {
+  // sort button toggle
+  const [lastPushed, setLastPushed] = useState("id");
+
+  //task edit propertis
+  const [editTask, setEditTask] = useState({});
+
+  // DidMount
+  useEffect(() => {
+    fetchTasksGet();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const hendleClickSortBtn = evn => {
+    const btnValue = evn.target.value;
+    if (btnValue === lastPushed) {
+      changeDirection();
+    } else {
+      sortBy(btnValue);
+      setLastPushed(() => btnValue);
+    }
+    fetchTasksGet();
+  };
+
+  const handlerPagenation = (e, btnName) => {
+    if (!e.target.className.split(" ").some(val => val === "disabled")) {
+      btnName === "next" ? goToNextPage() : goToPreviousPage();
+      fetchTasksGet();
+    }
+  };
+
+  const handleLogin = e => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    if (data.get("login") === LOGIN && data.get("password") === PASSWORD) {
+      logIn();
+    }
+  };
+
+  const handleLogOut = e => {
+    e.preventDefault();
+    logOut();
+  };
+
+  const handleCreatTask = e => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const bodyRequest = {};
+    for (let key of data.keys()) {
+      bodyRequest[key] = data.get(key);
+    }
+    console.log(bodyRequest);
+    fetchTaskPost(JSON.stringify(bodyRequest), "/create");
+  };
+
+  const handleEditTask = data => {
+    setEditTask(() => data);
+  };
+
+  const handleUpdateTask = data => {
+    const { task, status, id } = data;
+    const requestStr = `status=${{ status }}&task=${{ task }}&token=${{
+      token
+    }}`;
+    const signature = strictUriEncode(md5(requestStr));
+    const bodyRequest = { task, status, token, signature };
+    const url = `/edit/${id}`;
+    console.log("Request Body", bodyRequest, id, url);
+    fetchTaskPost(JSON.stringify(bodyRequest), url);
+    fetchTasksGet();
+    setEditTask(() => ({}));
+  };
+
+  const cancelEdit = () => {
+    setEditTask(() => ({}));
+  };
+
   return (
-    <div className="pt-5 mt-5">
-      <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <div className="collapse navbar-collapse" id="navbarCollapse">
-          <form className="form-inline mt-2 mt-md-0 ml-auto">
-            <div className="form-group mr-sm-2">
-              <label for="inputPassword2" className="sr-only">
-                Password
-              </label>
-              <input
-                type="login"
-                className="form-control"
-                id="inputPassword2"
-                placeholder="Login"
-              />
-            </div>
-            <div className="form-group mr-sm-2">
-              <label for="inputPassword2" className="sr-only">
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-control"
-                id="inputPassword2"
-                placeholder="Password"
-              />
-            </div>
-            <button
-              className="btn btn-outline-primary my-2 my-sm-0"
-              type="submit"
-            >
-              Log in
-            </button>
-          </form>
-        </div>
-      </nav>
-
-      <main className="container">
-        {/* Input task start */}
-        <form className="mb-5">
-          <div className="form-group">
-            <label for="exampleFormControlTextarea1">Task</label>
-            <textarea
-              className="form-control"
-              id="exampleFormControlTextarea1"
-              rows="3"
-            />
-          </div>
-          <div className="form-row">
-            <div className="form-group mb-2 col-sm-5">
-              <label className="sr-only">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Email"
-              />
-            </div>
-            <div className="form-group mb-2 col-sm-5">
-              <label className="sr-only">Password</label>
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Password"
-              />
-            </div>
-            <button type="submit" className="btn btn-primary mb-2 col-sm-2">
-              Submit
-            </button>
-          </div>
-        </form>
-        {/* Input task start */}
-        <div className="jumbotron">
-          <div className="card">
-            <fieldset disabled>
-              <form class="card-body">
-                <div class="form-row">
-                  <div class="col-8 mb-3">
-                    <label for="validationCustom03">Task</label>
-                    <textarea
-                      rows="3"
-                      type="text"
-                      class="form-control"
-                      value={`Lorem ipsum dolor sit, amet consectetur adipisicing elit. Iure ipsa ut perferendis, expedita, modi optio commodi nobis voluptas aliquid suscipit ad id itaque est enim quasi impedit culpa dolorem. Adipisci?`}
-                    />
-                  </div>
-                  <div class="col-3 mb-3">
-                    <label for="validationCustom04">Email</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      value="thelensky@ya.ru"
-                    />
-                  </div>
-                  <div class="col-1 mb-3">
-                    <label for="validationCustom05">Score</label>
-                    <select
-                      rows="1"
-                      class="form-control"
-                      id="exampleFormControlSelect2"
-                      value="10"
-                    >
-                      <option>0</option>
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                      <option>6</option>
-                      <option>7</option>
-                      <option>8</option>
-                      <option>9</option>
-                      <option>10</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      value=""
-                      defaultChecked={true}
-                    />
-                    <label class="form-check-label" for="invalidCheck">
-                      Compleat
-                    </label>
-                  </div>
-                </div>
-                <button class="btn btn-primary" type="submit">
-                  Submit form
-                </button>
-              </form>
-            </fieldset>
-          </div>
-        </div>
-      </main>
-
-      {/* Pagination start */}
-      <nav className="d-flex justify-content-center fixed-bottom mb-3">
-        <ul className="pagination">
-          <li className="page-item disabled">
-            <button className="page-link">Previous</button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">1</button>
-          </li>
-          <li className="page-item active">
-            <button className="page-link">
-              2 <span className="sr-only">(current)</span>
-            </button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">3</button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">Next</button>
-          </li>
-        </ul>
-      </nav>
-      {/* Pagination end */}
+    <div className="container pt-5 mt-5">
+      <Header
+        handleLogin={handleLogin}
+        handleLogOut={handleLogOut}
+        loged={loged}
+      />
+      <Form handleCreatTask={handleCreatTask} />
+      {login && Object.keys(editTask).length ? (
+        <Edit
+          taskForEdit={editTask}
+          handleUpdateTask={handleUpdateTask}
+          cancelEdit={cancelEdit}
+        />
+      ) : null}
+      <SortButtons hendleClickSortBtn={hendleClickSortBtn} />
+      <TaskList
+        taskList={tasks}
+        handleEditTask={handleEditTask}
+        permission={login}
+      />
+      <Pagination
+        previous={page - 3 > -1}
+        next={page + 3 < totalTaskCount}
+        handlerPagenation={handlerPagenation}
+      />
+      <h1>{Object.keys(editTask)}</h1>
     </div>
   );
 };
 
-export default App;
+const mapStateToProps = store => ({
+  tasks: store.tasks,
+  token: store.token,
+  login: store.login,
+  totalTaskCount: store.pageControl.totalTaskCount,
+  page: store.pageControl.page,
+  loged: store.login
+});
+
+export default connect(
+  mapStateToProps,
+  {
+    fetchTasksGet,
+    changeDirection,
+    sortBy,
+    goToPreviousPage,
+    goToNextPage,
+    logIn,
+    logOut,
+    fetchTaskPost
+  }
+)(App);

@@ -20,7 +20,8 @@ const sequelize = process.env.DATABASE_URL
 
 const Task = sequelize.define("task", {
   username: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    allowNull: false
   },
   id: {
     type: Sequelize.INTEGER,
@@ -30,10 +31,14 @@ const Task = sequelize.define("task", {
   },
   email: {
     type: Sequelize.STRING,
-    isEmail: true
+    allowNull:false,
+    validate: {
+      isEmail: true
+    }
   },
   task: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    allowNull: false
   },
   status: {
     type: Sequelize.INTEGER
