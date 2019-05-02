@@ -38,12 +38,6 @@ const Form = ({ handleCreatTask }) => (
           </select>
         </div>
       </div>
-      {/* <div className="form-group">
-        <div className="form-check">
-          <input className="form-check-input" type="checkbox" />
-          <label className="form-check-label">Compleat</label>
-        </div>
-      </div> */}
       <button className="btn btn-primary" type="submit">
         Create
       </button>

@@ -90,7 +90,6 @@ const App = ({
     for (let key of data.keys()) {
       bodyRequest[key] = data.get(key);
     }
-    console.log(bodyRequest);
     fetchTaskPost(JSON.stringify(bodyRequest), "/create");
   };
 
@@ -106,7 +105,6 @@ const App = ({
     const signature = strictUriEncode(md5(requestStr));
     const bodyRequest = { task, status, token, signature };
     const url = `/edit/${id}`;
-    console.log("Request Body", bodyRequest, id, url);
     fetchTaskPost(JSON.stringify(bodyRequest), url);
     fetchTasksGet();
     setEditTask(() => ({}));
